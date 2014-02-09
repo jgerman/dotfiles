@@ -1,0 +1,37 @@
+config defaultToCurrentScreen true
+config windowHintsShowIcons true
+config windowHintsIgnoreHiddenWindows true
+config windowHintsSpread true
+
+bind e:cmd hint ASDFGHJKLQWERTYUIOPCVBN
+
+alias full move screenOriginX;screenOriginY screenSizeX;screenSizeY
+alias lefthalf move screenOriginX;screenOriginY screenSizeX/2;screenSizeY
+alias righthalf move screenOriginX+screenSizeX/2;screenOriginY screenSizeX/2;screenSizeY
+alias topleft corner top-left resize:screenSizeX/2;screenSizeY/2
+alias topright corner top-right resize:screenSizeX/2;screenSizeY/2
+alias bottomleft corner bottom-left resize:screenSizeX/2;screenSizeY/2
+alias bottomright corner bottom-right resize:screenSizeX/2;screenSizeY/2
+
+bind pad1 ${bottomleft}
+bind pad2 push bottom bar-resize:screenSizeY/2
+bind pad3 ${bottomright}
+bind pad4 ${lefthalf}
+bind pad5 ${full}
+bind pad6 ${righthalf}
+bind pad7 ${topleft}
+bind pad8 push top bar-resize:screenSizeY/2
+bind pad9 ${topright}
+
+
+config layoutFocusOnActivate true
+layout develop 'iTerm' ${lefthalf} | ${topright} | ${bottomright}
+
+bind 1:cmd layout develop
+
+config layoutFocusOnActivate true
+layout develop2 'iTerm' ${lefthalf}
+layout develop2 'Google Chrome' ${righthalf}
+
+
+bind 2:cmd layout develop2

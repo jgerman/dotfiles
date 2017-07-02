@@ -335,6 +335,9 @@ you should place your code here."
     t)
   )
 
+(push "~/my-elisp" load-path)
+(require 'jays-clojure-helpers)
+
 ;; Do not write anything past this comment. This is where Emacs will
 ;; auto-generate custom variable definitions.
 (custom-set-variables

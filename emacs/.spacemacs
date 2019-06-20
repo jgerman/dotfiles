@@ -31,6 +31,7 @@ values."
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
    '(
+     racket
      haskell
      javascript
      yaml
@@ -39,12 +40,14 @@ values."
      lua
      markdown
      clojure
+     common-lisp
      ;; ----------------------------------------------------------------
      ;; Example of useful layers you may want to use right away.
      ;; Uncomment some layer names and press <SPC f e R> (Vim style) or
      ;; <M-m f e R> (Emacs style) to install them.
      ;; ----------------------------------------------------------------
      helm
+     ;ivy
      auto-completion
      ;; better-defaults
      emacs-lisp
@@ -58,6 +61,8 @@ values."
      ;; syntax-checking
      version-control
      journal
+     org-chef
+     plantuml
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
@@ -66,13 +71,17 @@ values."
    dotspacemacs-additional-packages '(build-status
                                       free-keys
                                       restclient
-                                      magithub
                                       exec-path-from-shell
                                       nov
                                       logview
                                       git-timemachine
                                       window-purpose
-                                    )
+                                      undo-tree
+                                      command-log-mode
+                                      alert
+                                      elmacro
+                                      forge
+                                      neotree)
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
    ;; A list of packages that will not be installed and loaded.
@@ -310,7 +319,9 @@ executes.
 before packages are loaded. If you are unsure, you should try in setting them in
 `dotspacemacs/user-config' first."
   (setq dotspacemacs-smartparens-strict-mode t)
-  ;(setq org-journal-dir "~/Dropbox/org/work-journal")  
+  (setq projectile-keymap-prefix (kbd "C-c C-p"))
+  (setq perp-keymap-prefix (kbd "C-c C-&"))
+  ;(setq org-journal-dir "~/Dropbox/org/work-journal")
   )
 
 (defun dotspacemacs/user-config ()
@@ -321,9 +332,6 @@ This is the place where most of your configurations should be done. Unless it is
 explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
 
-  (use-package magithub
-    :after magit
-    :config (magithub-feature-autoinject t))
   (global-set-key (kbd "C-,") 'ace-window)
   (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
   (global-set-key (kbd "C-)") 'sp-forward-slurp-sexp) ;; this shouldn't be always set but for now if it gets me going
@@ -346,8 +354,52 @@ you should place your code here."
 
   ;(add-to-list 'purpose-user-mode-purposes '(repl-mode . REPL))
   ;(purpose-compile-user-configuration)
-  )
 
+  (defhydra hydra-zoom (global-map "<f2>")
+    "zoom"
+    ("g" text-scale-increase "in")
+    ("l" text-scale-decrease "out")))
+
+(setq projectile-keymap-prefix (kbd "C-c C-p"))
+
+(with-eval-after-load 'magit
+  (require 'forge))
+
+(setq slime-lisp-implementations
+      '((clisp ("/usr/local/bin/clisp"))
+        (sbcl ("/usr/local/bin/sbcl"))))
+
+(setq inferior-lisp-program "/usr/local/bin/clisp")
+
+(setq frame-title-format '((:eval (projectile-project-name))))
+
+(defun find-config ()
+  "Edit config.org"
+  (interactive)
+  (find-file "~/.spacemacs"))
+
+(global-set-key (kbd "C-c I") 'find-config)
+(global-set-key (kbd "C-s") 'helm-swoop)
+(global-set-key (kbd "M-n") 'avy-goto-char-2)
+
+(setq org-plantuml-jar-path "/usr/local/Cellar/plantuml/1.2019.6/libexec/plantuml.jar")
+
+;; active Org-babel languages
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '(;; other Babel languages
+   (plantuml . t)))
+
+(with-eval-after-load 'org
+  (custom-theme-set-faces
+   'user
+   '(variable-pitch ((t (:family "Source Sans Pro" :height 180 :weight light))))
+   '(fixed-pitch ((t ( :family "Source Code Pro" :size 13 :weight normal :width normal :powerline-scale 1.1))))))
+
+(global-set-key [f8] 'neotree-toggle)
+
+; I like variable pitch mode but I can't have it for tables so until I know to put fixed font there this stays uncommented
+; (add-hook 'org-mode-hook 'variable-pitch-mode)
 (push "~/my-elisp" load-path)
 (require 'jays-clojure-helpers)
 (require 'git-link)
@@ -360,11 +412,12 @@ you should place your code here."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   (quote
-    (window-purpose imenu-list winum org-mime fuzzy helm-company helm-c-yasnippet company-web web-completion-data company-tern dash-functional tern company-statistics company-cabal company-anaconda clojure-snippets auto-yasnippet ac-ispell auto-complete logview datetime nov esxml org-journal whole-line-or-region es-mode spark intero flycheck hlint-refactor hindent helm-hoogle haskell-snippets company-ghci company-ghc ghc company haskell-mode cmm-mode magithub web-beautify livid-mode skewer-mode simple-httpd json-mode json-snatcher json-reformat js2-refactor js2-mode js-doc coffee-mode yaml-mode yapfify pyvenv pytest pyenv-mode py-isort pip-requirements live-py-mode hy-mode helm-pydoc cython-mode anaconda-mode pythonic web-mode tagedit slim-mode scss-mode sass-mode pug-mode less-css-mode helm-css-scss haml-mode emmet-mode pacmacs minesweeper chess restclient lua-mode smeargle orgit org-projectile org-present org org-pomodoro alert log4e gntp org-download magit-gitflow htmlize helm-gitignore gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter evil-magit magit magit-popup git-commit with-editor diff-hl build-status mmm-mode markdown-toc markdown-mode gh-md free-keys clj-refactor inflections edn multiple-cursors paredit yasnippet peg cider-eval-sexp-fu cider seq queue clojure-mode ws-butler window-numbering which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide ido-vertical-mode hydra hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make projectile pkg-info epl helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu highlight elisp-slime-nav dumb-jump f s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed dash aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup async quelpa package-build spacemacs-theme))))
+   '(plantuml-mode racket-mode geiser slime-company slime common-lisp-snippets wgrep smex ivy-hydra counsel-projectile counsel swiper ivy forge closql emacsql-sqlite emacsql org-category-capture ghub+ apiwrap ghub treepy graphql extmap transient sesman jabber srv fsm elmacro org-chef poet-theme-theme poet-theme command-log-mode window-purpose imenu-list winum org-mime fuzzy helm-company helm-c-yasnippet company-web web-completion-data company-tern dash-functional tern company-statistics company-cabal company-anaconda clojure-snippets auto-yasnippet ac-ispell auto-complete logview datetime nov esxml org-journal whole-line-or-region es-mode spark intero flycheck hlint-refactor hindent helm-hoogle haskell-snippets company-ghci company-ghc ghc company haskell-mode cmm-mode magithub web-beautify livid-mode skewer-mode simple-httpd json-mode json-snatcher json-reformat js2-refactor js2-mode js-doc coffee-mode yaml-mode yapfify pyvenv pytest pyenv-mode py-isort pip-requirements live-py-mode hy-mode helm-pydoc cython-mode anaconda-mode pythonic web-mode tagedit slim-mode scss-mode sass-mode pug-mode less-css-mode helm-css-scss haml-mode emmet-mode pacmacs minesweeper chess restclient lua-mode smeargle orgit org-projectile org-present org org-pomodoro alert log4e gntp org-download magit-gitflow htmlize helm-gitignore gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter evil-magit magit magit-popup git-commit with-editor diff-hl build-status mmm-mode markdown-toc markdown-mode gh-md free-keys clj-refactor inflections edn multiple-cursors paredit yasnippet peg cider-eval-sexp-fu cider seq queue clojure-mode ws-butler window-numbering which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide ido-vertical-mode hydra hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make projectile pkg-info epl helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu highlight elisp-slime-nav dumb-jump f s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed dash aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup async quelpa package-build spacemacs-theme)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:foreground "#DCDCCC" :background "#313131")))))
+ '(default ((t (:foreground "#DCDCCC" :background "#313131"))))
+ '(fixed-pitch ((t (:family "Source Code Pro" :size 13 :weight normal :width normal :powerline-scale 1.1))))
+ '(variable-pitch ((t (:family "Source Sans Pro" :height 180 :weight light)))))

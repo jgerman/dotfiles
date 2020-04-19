@@ -63,6 +63,8 @@ values."
      journal
      org-chef
      plantuml
+     themes-megapack
+     theming
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
@@ -81,7 +83,13 @@ values."
                                       alert
                                       elmacro
                                       forge
-                                      neotree)
+                                      neotree
+                                      vterm
+                                      (multi-libvterm :location
+                                                      (recipe
+                                                       :fetcher github
+                                                       :repo "suonlight/multi-libvterm"))
+                                      kubernetes)
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
    ;; A list of packages that will not be installed and loaded.
@@ -153,9 +161,12 @@ values."
    ;; List of themes, the first of the list is loaded when spacemacs starts.
    ;; Press <SPC> T n to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
-   dotspacemacs-themes '(hc-zenburn
+ dotspacemacs-themes '(darkburn
+                         clues
+                         planet
+                         hc-zenburn
                          spacemacs-dark
-                         spacemacs-light)
+                         subatomic)
    ;; If non nil the cursor color matches the state color in GUI Emacs.
    dotspacemacs-colorize-cursor-according-to-state t
    ;; Default font, or prioritized list of fonts. `powerline-scale' allows to
@@ -352,6 +363,10 @@ you should place your code here."
                                         ;(global-auto-revert-mode -1)
   (global-company-mode t)
 
+  (org-babel-do-load-languages 'org-babel-load-languages
+                               '((shell   . t)
+                                 (clojure . t)
+                                 (python . t)))
   ;(add-to-list 'purpose-user-mode-purposes '(repl-mode . REPL))
   ;(purpose-compile-user-configuration)
 
@@ -371,7 +386,7 @@ you should place your code here."
 
 (setq inferior-lisp-program "/usr/local/bin/clisp")
 
-(setq frame-title-format '((:eval (projectile-project-name))))
+;;(setq frame-title-format '((:eval (projectile-project-name))))
 
 (defun find-config ()
   "Edit config.org"
@@ -390,6 +405,9 @@ you should place your code here."
  '(;; other Babel languages
    (plantuml . t)))
 
+;;(use-package multi-libvterm
+;;  :load-path "/Users/jgerman/emacs-libs/multi-libvterm")
+
 (with-eval-after-load 'org
   (custom-theme-set-faces
    'user
@@ -401,8 +419,8 @@ you should place your code here."
 ; I like variable pitch mode but I can't have it for tables so until I know to put fixed font there this stays uncommented
 ; (add-hook 'org-mode-hook 'variable-pitch-mode)
 (push "~/my-elisp" load-path)
-(require 'jays-clojure-helpers)
-(require 'git-link)
+;;(require 'jays-clojure-helpers)
+;;(require 'git-link)
 
 ;; Do not write anything past this comment. This is where Emacs will
 ;; auto-generate custom variable definitions.
@@ -411,13 +429,41 @@ you should place your code here."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+   (quote
+    ("834cbeacb6837f3ddca4a1a7b19b1af3834f36a701e8b15b628cad3d85c970ff" "fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" "bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" default)))
+ '(evil-want-Y-yank-to-eol nil)
+ '(fci-rule-color "#5E5E5E" t)
  '(package-selected-packages
-   '(plantuml-mode racket-mode geiser slime-company slime common-lisp-snippets wgrep smex ivy-hydra counsel-projectile counsel swiper ivy forge closql emacsql-sqlite emacsql org-category-capture ghub+ apiwrap ghub treepy graphql extmap transient sesman jabber srv fsm elmacro org-chef poet-theme-theme poet-theme command-log-mode window-purpose imenu-list winum org-mime fuzzy helm-company helm-c-yasnippet company-web web-completion-data company-tern dash-functional tern company-statistics company-cabal company-anaconda clojure-snippets auto-yasnippet ac-ispell auto-complete logview datetime nov esxml org-journal whole-line-or-region es-mode spark intero flycheck hlint-refactor hindent helm-hoogle haskell-snippets company-ghci company-ghc ghc company haskell-mode cmm-mode magithub web-beautify livid-mode skewer-mode simple-httpd json-mode json-snatcher json-reformat js2-refactor js2-mode js-doc coffee-mode yaml-mode yapfify pyvenv pytest pyenv-mode py-isort pip-requirements live-py-mode hy-mode helm-pydoc cython-mode anaconda-mode pythonic web-mode tagedit slim-mode scss-mode sass-mode pug-mode less-css-mode helm-css-scss haml-mode emmet-mode pacmacs minesweeper chess restclient lua-mode smeargle orgit org-projectile org-present org org-pomodoro alert log4e gntp org-download magit-gitflow htmlize helm-gitignore gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter evil-magit magit magit-popup git-commit with-editor diff-hl build-status mmm-mode markdown-toc markdown-mode gh-md free-keys clj-refactor inflections edn multiple-cursors paredit yasnippet peg cider-eval-sexp-fu cider seq queue clojure-mode ws-butler window-numbering which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide ido-vertical-mode hydra hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make projectile pkg-info epl helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu highlight elisp-slime-nav dumb-jump f s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed dash aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup async quelpa package-build spacemacs-theme)))
+   (quote
+    (kubernetes zenburn-theme zen-and-art-theme white-sand-theme underwater-theme ujelly-theme twilight-theme twilight-bright-theme twilight-anti-bright-theme toxi-theme tao-theme tangotango-theme tango-plus-theme tango-2-theme sunny-day-theme sublime-themes subatomic256-theme subatomic-theme spacegray-theme soothe-theme solarized-theme soft-stone-theme soft-morning-theme soft-charcoal-theme smyx-theme seti-theme reverse-theme rebecca-theme railscasts-theme purple-haze-theme professional-theme planet-theme phoenix-dark-pink-theme phoenix-dark-mono-theme organic-green-theme omtose-phellack-theme oldlace-theme occidental-theme obsidian-theme noctilux-theme naquadah-theme mustang-theme monokai-theme monochrome-theme molokai-theme moe-theme minimal-theme material-theme majapahit-theme madhat2r-theme lush-theme light-soap-theme jbeans-theme jazz-theme ir-black-theme inkpot-theme heroku-theme hemisu-theme gruvbox-theme gruber-darker-theme grandshell-theme gotham-theme gandalf-theme flatui-theme flatland-theme farmhouse-theme exotica-theme espresso-theme dracula-theme django-theme darktooth-theme autothemer darkokai-theme darkmine-theme darkburn-theme dakrone-theme cyberpunk-theme color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized clues-theme cherry-blossom-theme busybee-theme bubbleberry-theme birds-of-paradise-plus-theme badwolf-theme apropospriate-theme anti-zenburn-theme ample-zen-theme ample-theme alect-themes afternoon-theme multi-libvterm vterm faceup parseedn parseclj a plantuml-mode racket-mode geiser slime-company slime common-lisp-snippets wgrep smex ivy-hydra counsel-projectile counsel swiper ivy forge closql emacsql-sqlite emacsql org-category-capture ghub+ apiwrap ghub treepy graphql extmap transient sesman jabber srv fsm elmacro org-chef poet-theme-theme poet-theme command-log-mode window-purpose imenu-list winum org-mime fuzzy helm-company helm-c-yasnippet company-web web-completion-data company-tern dash-functional tern company-statistics company-cabal company-anaconda clojure-snippets auto-yasnippet ac-ispell auto-complete logview datetime nov esxml org-journal whole-line-or-region es-mode spark intero flycheck hlint-refactor hindent helm-hoogle haskell-snippets company-ghci company-ghc ghc company haskell-mode cmm-mode magithub web-beautify livid-mode skewer-mode simple-httpd json-mode json-snatcher json-reformat js2-refactor js2-mode js-doc coffee-mode yaml-mode yapfify pyvenv pytest pyenv-mode py-isort pip-requirements live-py-mode hy-mode helm-pydoc cython-mode anaconda-mode pythonic web-mode tagedit slim-mode scss-mode sass-mode pug-mode less-css-mode helm-css-scss haml-mode emmet-mode pacmacs minesweeper chess restclient lua-mode smeargle orgit org-projectile org-present org org-pomodoro alert log4e gntp org-download magit-gitflow htmlize helm-gitignore gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter evil-magit magit magit-popup git-commit with-editor diff-hl build-status mmm-mode markdown-toc markdown-mode gh-md free-keys clj-refactor inflections edn multiple-cursors paredit yasnippet peg cider-eval-sexp-fu cider seq queue clojure-mode ws-butler window-numbering which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide ido-vertical-mode hydra hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make projectile pkg-info epl helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu highlight elisp-slime-nav dumb-jump f s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed dash aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup async quelpa package-build spacemacs-theme)))
+ '(vc-annotate-background "#202020")
+ '(vc-annotate-color-map
+   (quote
+    ((20 . "#C99090")
+     (40 . "#D9A0A0")
+     (60 . "#ECBC9C")
+     (80 . "#DDCC9C")
+     (100 . "#EDDCAC")
+     (120 . "#FDECBC")
+     (140 . "#6C8C6C")
+     (160 . "#8CAC8C")
+     (180 . "#9CBF9C")
+     (200 . "#ACD2AC")
+     (220 . "#BCE5BC")
+     (240 . "#CCF8CC")
+     (260 . "#A0EDF0")
+     (280 . "#79ADB0")
+     (300 . "#89C5C8")
+     (320 . "#99DDE0")
+     (340 . "#9CC7FB")
+     (360 . "#E090C7"))))
+ '(vc-annotate-very-old-color "#E090C7"))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:foreground "#DCDCCC" :background "#313131"))))
+ '(default ((t (:foreground "#DCDCCC" :background "#111111"))))
  '(fixed-pitch ((t (:family "Source Code Pro" :size 13 :weight normal :width normal :powerline-scale 1.1))))
  '(variable-pitch ((t (:family "Source Sans Pro" :height 180 :weight light)))))
